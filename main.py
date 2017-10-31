@@ -17,15 +17,12 @@ class Blog(db.Model):
     title = db.Column(db.String(120))
     body = db.Column(db.String(200))
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    
-    
 
     def __init__(self, title, body, owner):
         self.title = title
         self.body = body
         self.owner = owner
-        
-        
+    
 #create a user class/table with 4 columns; name and type each variable
 class User(db.Model):
 
@@ -87,7 +84,7 @@ def register():
 #require log in 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'register', 'Blog_function']
+    allowed_routes = ['login', 'register', 'Blog_function', 'all_users']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -120,12 +117,21 @@ def logout():
 
 @app.route('/blog', methods=['GET'])
 def Blog_function():
-    
-    if request.args:
-        id = request.args.get("id")
+    id = request.args.get("id")
+    #new_var = "user" from request
+    ind_user = request.args.get("user")
+
+    if id != None:
+        
         blog = Blog.query.get(id)
 
         return render_template('blogentry.html', blog=blog)
+
+    elif ind_user != None:# new_var does not equal none:
+        #query for user
+        user = User.query.filter_by(username=ind_user).first()
+        #render template and pass user to template
+        return render_template('newtemplate.html', user=user)
 
     else:   
         blog = Blog.query.all()
@@ -135,7 +141,6 @@ def Blog_function():
 @app.route('/home', methods=['GET'])
 def all_users():
     users = User.query.all()
-    blogs = Blog.query.all()
     return render_template('singleUser.html', users=users)
 
 
