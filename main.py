@@ -41,6 +41,7 @@ class User(db.Model):
 
 @app.route('/')
 def index():
+    allowed_routes = ['singleUser', 'blog']
     return render_template('index.html')
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -66,7 +67,7 @@ def register():
             # return redirect('/sorry')
 
         if not username_error or not password_error:
-            return redirect("/register")
+            pass
 
         existing_user = User.query.filter_by(username=username).first()
         if not existing_user:
@@ -74,18 +75,19 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
-            flash("username does not exist", " error")
-            return redirect('/register')
+            #flash("username does not exist", " error")
+            return redirect('/newpost')
         else:
             # TODO - user better response messaging
             return "<h1>Duplicate user</h1>"
+
     return render_template('signup.html')
 
 
 #require log in 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'register']
+    allowed_routes = ['login', 'register', 'Blog_function']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -128,21 +130,13 @@ def Blog_function():
     else:   
         blog = Blog.query.all()
 
-        return render_template('blog.html', title="Blogz", blogs=blog)
+        return render_template('blog.html', title="Blogz", blogs=blog) 
 
-@app.route('/singleUser', methods=['GET'])
-def Single_blog_function():
-    
-    if request.args:
-        id = request.args.get("id")
-        blog = Blog.query.get(id)
-
-        return render_template('blogentry.html', blog=blog)
-
-    else:   
-        blog = Blog.query.all(user=userID)
-
-        return render_template('blog.html', title="Blogz", blogs=blog)   
+@app.route('/home', methods=['GET'])
+def all_users():
+    users = User.query.all()
+    blogs = Blog.query.all()
+    return render_template('singleUser.html', users=users)
 
 
 @app.route('/newpost', methods=['GET','POST'])

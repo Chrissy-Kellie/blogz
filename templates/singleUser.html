@@ -2,15 +2,15 @@
 
 {% block content %}
 
-    <h1>Individual Blogz</h1>
+    <h1>Individual Users</h1>
 
     {% if blogs|length == 0 %}
-    <p>No blogs yet</p>
+    <p>No users yet</p>
     {% else %}
 
         <div class="blogentry">
-            {% for blog in blogs %}
-            <h2><a href="blog?user={{userId.id}}">{{blog.title}}</a></h2>
+            {% for user in users %}
+            <h2><a href="/blog?user={{user.username}}">{{users.username}}</a></h2>
             {% endfor %}
         </div>
     {% endif %}
